@@ -3,7 +3,7 @@ package by.motolyha.mangaproject.model.entity;
 import java.sql.Date;
 import java.util.Objects;
 
-public class Book implements Entity {
+public class Book {
 
     private int id;
     private String name;

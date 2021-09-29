@@ -2,7 +2,7 @@ package by.motolyha.mangaproject.model.entity;
 
 import java.util.Objects;
 
-public class Chapter implements Entity {
+public class Chapter {
 
     private Book book;
     private int page;

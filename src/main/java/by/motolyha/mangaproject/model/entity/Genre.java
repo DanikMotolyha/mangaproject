@@ -2,7 +2,7 @@ package by.motolyha.mangaproject.model.entity;
 
 import java.util.Objects;
 
-public class Genre implements Entity {
+public class Genre {
 
     private int id;
     private String name;

@@ -2,7 +2,7 @@ package by.motolyha.mangaproject.model.entity;
 
 import java.util.Objects;
 
-public class UserBookList implements Entity {
+public class UserBookList {
 
     private Book book;
     private User user;

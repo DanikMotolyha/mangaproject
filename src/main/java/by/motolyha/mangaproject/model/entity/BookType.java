@@ -2,7 +2,7 @@ package by.motolyha.mangaproject.model.entity;
 
 import java.util.Objects;
 
-public class BookType implements Entity {
+public class BookType {
 
     private int id;
     private String name;

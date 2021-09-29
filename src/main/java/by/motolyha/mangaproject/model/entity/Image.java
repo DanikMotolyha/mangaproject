@@ -2,7 +2,7 @@ package by.motolyha.mangaproject.model.entity;
 
 import java.util.Objects;
 
-public class Image implements Entity {
+public class Image {
 
     private int id;
     private int page;

@@ -2,7 +2,7 @@ package by.motolyha.mangaproject.model.entity;
 
 import java.util.Objects;
 
-public class User implements Entity {
+public class User {
 
     private int id;
     private String login;
@@ -11,6 +11,10 @@ public class User implements Entity {
     private String email;
     private Role role;
     private String avatarSrc;
+
+    public User() {
+
+    }
 
     public User(int id, String login, String password, String description,
                 String email, Role role, String avatarSrc) {

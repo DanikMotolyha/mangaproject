@@ -2,7 +2,7 @@ package by.motolyha.mangaproject.model.entity;
 
 import java.util.Objects;
 
-public class BookReview implements Entity {
+public class BookReview {
 
     private User user;
     private Book book;
