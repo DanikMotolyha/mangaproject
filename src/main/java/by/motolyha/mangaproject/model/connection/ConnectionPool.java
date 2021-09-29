@@ -1,8 +1,8 @@
 package by.motolyha.mangaproject.model.connection;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -14,8 +14,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ConnectionPool  {
-    private static final Logger logger = LogManager.getLogger();
+public class ConnectionPool {
+    private static final Logger logger = LogManager.getLogger(ConnectionPool.class);
     private static ConnectionPool instance = new ConnectionPool();
     private static final ReentrantLock lock = new ReentrantLock();
     private static final AtomicBoolean isPoolCreated = new AtomicBoolean(false);
@@ -40,11 +40,11 @@ public class ConnectionPool  {
                 ProxyConnection proxyConnection = new ProxyConnection(connection);
                 freeConnections.offer(proxyConnection);
             } catch (SQLException e) {
-                logger.log(Level.ERROR,"can't create connection, exception: ", e);
+                logger.log(Level.ERROR, "can't create connection, exception: ", e);
             }
         }
         if (freeConnections.isEmpty()) {
-            logger.log(Level.FATAL,"can't create connections");
+            logger.log(Level.FATAL, "can't create connections");
             throw new RuntimeException("can't create connections");
         }
     }
@@ -91,7 +91,7 @@ public class ConnectionPool  {
             try {
                 freeConnections.take().completeClose();
             } catch (InterruptedException | SQLException e) {
-                logger.log(Level.ERROR,"Connection isn't deleted");
+                logger.log(Level.ERROR, "Connection isn't deleted");
             }
         }
         deregisterDrivers();
@@ -105,7 +105,7 @@ public class ConnectionPool  {
             try {
                 DriverManager.deregisterDriver(driver);
             } catch (SQLException e) {
-                logger.log(Level.ERROR,"drivers aren't' deregister, driver: {}, exception: {}", driver, e);
+                logger.log(Level.ERROR, "drivers aren't' deregister, driver: {}, exception: {}", driver, e);
             }
         }
     }
