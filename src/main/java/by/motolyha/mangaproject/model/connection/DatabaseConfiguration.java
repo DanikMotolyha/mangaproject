@@ -3,13 +3,13 @@ package by.motolyha.mangaproject.model.connection;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 
 public class DatabaseConfiguration {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(DatabaseConfiguration.class);
     private static final String DATABASE_PATH = "database";
     private static final String DB_URL = "db.url";
     private static final String DB_USER = "db.user";
@@ -57,7 +57,7 @@ public class DatabaseConfiguration {
             var dbDriver = resourceBundle.getString(DB_DRIVER);
             var poolSize = Integer.parseInt(resourceBundle.getString(DB_POOL_SIZE));
             if (poolSize < 1 || poolSize > 24) {
-                logger.log(Level.FATAL, "pool size can't be less than 1 and more than 25: {}", poolSize);
+                logger.log(Level.FATAL, "pool size can't be less than 1 and more than 25: " + poolSize);
                 throw new RuntimeException("pool size can't be less than 1 and more than 25");
             }
 
