@@ -9,6 +9,7 @@ import by.motolyha.mangaproject.model.dto.SignUpData;
 import by.motolyha.mangaproject.model.entity.ResultSignUp;
 import by.motolyha.mangaproject.model.entity.User;
 import by.motolyha.mangaproject.model.service.UserService;
+import by.motolyha.mangaproject.util.MailSender;
 import by.motolyha.mangaproject.util.PasswordEncryptor;
 import by.motolyha.mangaproject.validator.UserValidator;
 
@@ -18,6 +19,7 @@ public class UserServiceImpl implements UserService {
     private static final DaoProvider daoProvider = DaoProvider.getInstance();
     private static final UserDao userDao = daoProvider.getUserDao();
     private static final UserValidator validator = new UserValidator();
+    private static final MailSender sender = new MailSender();
 
     protected UserServiceImpl() {
     }
