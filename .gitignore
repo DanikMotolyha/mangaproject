@@ -1,5 +1,6 @@
 # Project exclude paths
 /out/
-
+/lib/
+/logs/
 #.idea
 .idea
