@@ -2,5 +2,6 @@
 /out/
 /lib/
 /logs/
+/src/main/webapp/static/
 #.idea
 .idea
