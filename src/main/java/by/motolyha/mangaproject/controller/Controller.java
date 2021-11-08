@@ -7,10 +7,12 @@ import org.apache.logging.log4j.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 @WebServlet(urlPatterns = "/Controller", loadOnStartup = 1)
 public class Controller extends HttpServlet {
@@ -31,6 +33,12 @@ public class Controller extends HttpServlet {
         String commandName = request.getParameter(RequestParameter.COMMAND);
         Command command = COMMAND_PROVIDER.getCommand(commandName);
         Router router = command.execute(request);
+
+        Cookie[] cookies = router.getCookies();
+        if (cookies != null) {
+            Arrays.stream(cookies).forEach(response::addCookie);
+        }
+        //todo !!!
         System.out.println(commandName);
         System.out.println(router.getPagePath() + " PAGEPATH");
 
