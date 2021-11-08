@@ -9,6 +9,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <html>
 <body>
-    error
+    error <br/>
+    <ul>
+        <li>Request from ${pageContext.errorData.requestURI} </li>
+        <li>Servlet name: ${pageContext.errorData.servletName}</li>
+        <li>Status code: ${pageContext.errorData.statusCode}</li>
+        <li>Exception: ${pageContext.exception}</li>
+        <li>Message from exception: ${pageContext.exception.message}</li
+        <li>details: ${exception}</li
+    </ul>
 </body>
 </html>
