@@ -3,5 +3,6 @@
 /lib/
 /logs/
 /src/main/webapp/static/
+/src/main/resources/
 #.idea
 .idea
