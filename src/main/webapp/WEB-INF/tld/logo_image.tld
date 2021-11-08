@@ -1,0 +1,12 @@
+<taglib>
+    <tlib-version>1.0</tlib-version>
+    <jsp-version>2.0</jsp-version>
+    <short-name>logo_image</short-name>
+    <uri>logo_image</uri>
+
+    <tag>
+        <name>image</name>
+        <tag-class>by.motolyha.mangaproject.tag.CustomLogoImageTag</tag-class>
+        <body-content>empty</body-content>
+    </tag>
+</taglib>

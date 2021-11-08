@@ -13,7 +13,7 @@
         <location>/pages/errors/404.jsp</location>
     </error-page>
     <error-page>
-        <error-code>403</error-code>
-        <location>/pages/errors/404.jsp</location>
+        <error-code>500</error-code>
+        <location>/pages/errors/error.jsp</location>
     </error-page>
 </web-app>
