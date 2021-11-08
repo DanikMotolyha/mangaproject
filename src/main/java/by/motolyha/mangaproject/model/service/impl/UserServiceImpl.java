@@ -2,24 +2,33 @@ package by.motolyha.mangaproject.model.service.impl;
 
 import by.motolyha.mangaproject.exception.DaoException;
 import by.motolyha.mangaproject.exception.ServiceException;
+import by.motolyha.mangaproject.model.dao.AvatarDao;
+import by.motolyha.mangaproject.model.dao.impl.AvatarDaoImpl;
 import by.motolyha.mangaproject.model.dao.impl.DaoProvider;
 import by.motolyha.mangaproject.model.dao.UserDao;
-import by.motolyha.mangaproject.model.dto.SignInData;
-import by.motolyha.mangaproject.model.dto.SignUpData;
-import by.motolyha.mangaproject.model.entity.ResultSignUp;
+import by.motolyha.mangaproject.model.entity.Avatar;
+import by.motolyha.mangaproject.model.service.resultcode.ResultForgotPassword;
+import by.motolyha.mangaproject.model.service.resultcode.ResultSignUp;
 import by.motolyha.mangaproject.model.entity.User;
 import by.motolyha.mangaproject.model.service.UserService;
 import by.motolyha.mangaproject.util.MailSender;
 import by.motolyha.mangaproject.util.PasswordEncryptor;
 import by.motolyha.mangaproject.validator.UserValidator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
+    private static final Logger logger = LogManager.getRootLogger();
     private static final DaoProvider daoProvider = DaoProvider.getInstance();
     private static final UserDao userDao = daoProvider.getUserDao();
+
     private static final UserValidator validator = new UserValidator();
     private static final MailSender sender = new MailSender();
+    private static final int DEFAULT_USER_AVATAR_INDEX = 1;
 
     protected UserServiceImpl() {
     }
@@ -37,6 +46,7 @@ public class UserServiceImpl implements UserService {
         try {
             user = userDao.findByLogin(login);
         } catch (DaoException exception) {
+            logger.error(exception.getMessage());
             throw new ServiceException(exception);
         }
         if (user.isEmpty()) {
@@ -66,57 +76,64 @@ public class UserServiceImpl implements UserService {
             PasswordEncryptor encryptor = PasswordEncryptor.getInstance();
             String hashPassword = encryptor.getHash(password);
             String description = "";
-            String avatarSrc = "";
+
             userDao.create(
                     login,
                     hashPassword,
                     description,
                     email,
-                    avatarSrc
+                    DEFAULT_USER_AVATAR_INDEX
             );
+            sender.sendNewPasswordToMail(login, password, email);
             return ResultSignUp.SUCCESS;
         } catch (DaoException exception) {
+            logger.error(exception.getMessage());
             throw new ServiceException(exception);
         }
     }
 
     @Override
-    public boolean forgotPassword(String email) throws ServiceException {
+    public ResultForgotPassword forgotPassword(String email) throws ServiceException {
         if (!validator.emailValidate(email)) {
-            return false;
+            throw new ServiceException("invalid email");
         }
-        //todo сделать перессылку на почту токена с ссылкой на команду создания нового пароля (
-        // ссылку создавать с токеном в котором старый пароль /** что бы второй раз она не сработала, тк будет уже новый сгенерированный)
-        return false;
+        try {
+            Optional<User> userOptional = userDao.findByEmail(email);
+            if (userOptional.isEmpty()) {
+                return ResultForgotPassword.USER_DOES_NOT_EXIST;
+            }
+            User user = userOptional.get();
+            LocalDate now = LocalDate.now();
+            LocalDate resendPasswordDate = user.getResendPasswordDate();
+            long timeDifference = Duration.between(resendPasswordDate.atStartOfDay(), now.atStartOfDay()).toDays();
+            if (timeDifference <= 3) {
+                return ResultForgotPassword.DENIED;
+            } else {
+                String password = PasswordEncryptor.generateRandomPassword();
+                PasswordEncryptor encryptor = PasswordEncryptor.getInstance();
+                String passwordHash = encryptor.getHash(password);
+                user.setPassword(passwordHash);
+                user.setResendPasswordDate(LocalDate.now());
+                userDao.update(user);
+                sender.sendNewPasswordToMail(user.getLogin(), password, email);
+            }
+        } catch (DaoException exception) {
+            logger.error(exception.getMessage());
+            throw new ServiceException(exception);
+        }
+        return ResultForgotPassword.SUCCESS;
     }
 
     @Override
-    public void updateUserData(Integer idUser, User newUserData) throws ServiceException {
+    public void updateUserData(User newUserData) throws ServiceException {
         if (!validator.emailValidate(newUserData.getEmail())
                 || !validator.loginValidate(newUserData.getLogin())) {
             throw new ServiceException("incorrect data");
         }
         try {
-            userDao.update(
-                    newUserData.getLogin(),
-                    newUserData.getDescription(),
-                    newUserData.getEmail(),
-                    newUserData.getAvatarSrc(),
-                    idUser);
+            userDao.update(newUserData);
         } catch (DaoException exception) {
-            throw new ServiceException(exception);
-        }
-    }
-
-    @Override
-    public void updateUserPassword(Integer idUser, String password) throws ServiceException {
-        if (!validator.passwordValidate(password)) {
-            throw new ServiceException("incorrect password");
-        }
-        String hash = PasswordEncryptor.getInstance().getHash(password);
-        try {
-            userDao.updatePassword(idUser, hash);
-        } catch (DaoException exception) {
+            logger.error(exception.getMessage());
             throw new ServiceException(exception);
         }
     }

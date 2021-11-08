@@ -1,28 +1,29 @@
-package by.motolyha.mangaproject.model.entity;
+package by.motolyha.mangaproject.model.dto;
+
+import by.motolyha.mangaproject.model.entity.Role;
+import by.motolyha.mangaproject.model.entity.User;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class User {
+public class SessionUser {
 
     private int id;
     private String login;
-    private String password;
     private String description;
     private String email;
     private Role role;
     private int idAvatar;
     private LocalDate resendPasswordDate;
 
-    public User() {
+    public SessionUser() {
 
     }
 
-    public User(int id, String login, String password, String description,
+    public SessionUser(int id, String login, String description,
                 String email, Role role, int idAvatar, LocalDate resendPasswordDate) {
         this.id = id;
         this.login = login;
-        this.password = password;
         this.description = description;
         this.email = email;
         this.role = role;
@@ -32,14 +33,6 @@ public class User {
 
     public LocalDate getResendPasswordDate() {
         return resendPasswordDate;
-    }
-
-    public int getIdAvatar() {
-        return idAvatar;
-    }
-
-    public void setIdAvatar(int idAvatar) {
-        this.idAvatar = idAvatar;
     }
 
     public void setResendPasswordDate(LocalDate resendPasswordDate) {
@@ -60,14 +53,6 @@ public class User {
 
     public void setLogin(String login) {
         this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getDescription() {
@@ -95,14 +80,21 @@ public class User {
         this.role = role;
     }
 
+    public int getIdAvatar() {
+        return idAvatar;
+    }
+
+    public void setIdAvatar(int idAvatar) {
+        this.idAvatar = idAvatar;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        var user = (User) o;
+        var user = (SessionUser) o;
         return id == user.id
                 && Objects.equals(login, user.login)
-                && Objects.equals(password, user.password)
                 && Objects.equals(description, user.description)
                 && Objects.equals(email, user.email)
                 && role == user.role
@@ -114,7 +106,6 @@ public class User {
     public int hashCode() {
         int result = 31 * id;
         result = 31 * result + (login != null ? login.hashCode() : 0);
-        result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + idAvatar;
@@ -127,7 +118,6 @@ public class User {
         var sb = new StringBuilder("User{");
         sb.append("id=").append(id);
         sb.append(", login='").append(login).append('\'');
-        sb.append(", password='").append(password).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", email='").append(email).append('\'');
         sb.append(", role=").append(role);

@@ -4,22 +4,22 @@ import java.util.Objects;
 
 public class Chapter {
 
-    private Book book;
+    private int id;
     private int page;
     private String name;
 
-    public Chapter(Book book, int page, String name) {
-        this.book = book;
+    public Chapter(int id, int page, String name) {
+        this.id = id;
         this.page = page;
         this.name = name;
     }
 
-    public Book getBook() {
-        return book;
+    public int getId() {
+        return id;
     }
 
-    public void setBook(Book book) {
-        this.book = book;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getPage() {
@@ -44,13 +44,13 @@ public class Chapter {
         if (o == null || getClass() != o.getClass()) return false;
         var chapter = (Chapter) o;
         return page == chapter.page
-                && Objects.equals(book, chapter.book)
+                && id == chapter.id
                 && Objects.equals(name, chapter.name);
     }
 
     @Override
     public int hashCode() {
-        int result = 31 + (book != null ? book.hashCode() : 0);
+        int result = 31 * id;
         result = 31 * result + page;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
@@ -60,7 +60,7 @@ public class Chapter {
     @Override
     public String toString() {
         var sb = new StringBuilder("Chapter{");
-        sb.append("book=").append(book);
+        sb.append("id=").append(id);
         sb.append(", page=").append(page);
         sb.append(", chapterName='").append(name).append('\'');
         sb.append('}');

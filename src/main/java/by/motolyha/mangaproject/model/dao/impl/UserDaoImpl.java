@@ -6,45 +6,38 @@ import by.motolyha.mangaproject.model.dao.UserDao;
 import by.motolyha.mangaproject.model.entity.Role;
 import by.motolyha.mangaproject.model.entity.User;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static by.motolyha.mangaproject.model.dao.ColumnName.*;
 
-class UserDaoImpl implements UserDao {
+public class UserDaoImpl implements UserDao {
 
     private static final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     /**
      * Query for database to create new user
      */
-    private static final String CREATE_SQL = "INSERT INTO USER (login, password, description,email, role, avatar_src) VALUES (?,?,?,?,?,?)";
+    private static final String CREATE_SQL = "INSERT INTO USER (login, password, description,email, role, id_avatar, resend_password) VALUES (?,?,?,?,?,?,?)";
 
-    private static final String UPDATE_DATA_SQL = "UPDATE USER SET login = ?, description = ?, email = ?, avatar_src = ? where id = ?";
+    private static final String UPDATE_DATA_SQL = "UPDATE USER SET login = ?, description = ?, email = ?, id_avatar = ?, resend_password = ?, password = ? where id = ?";
 
-    private static final String UPDATE_PASSWORD_SQL = "UPDATE USER SET password = ? where id = ?";
+    private static final String FIND_ALL_SQL = "SELECT id, login, password, description, email, role, id_avatar, resend_password FROM USER";
 
-    private static final String FIND_ALL_SQL = "SELECT id, login, password, description, email, role, avatar_src FROM USER";
+    private static final String FIND_BY_LOGIN_SQL = "SELECT id, login, password, description, email, role, id_avatar, resend_password FROM USER WHERE LOGIN = ?";
 
-    private static final String FIND_BY_LOGIN_SQL = "SELECT id, login, password, description, email, role, avatar_src FROM USER WHERE LOGIN = ?";
+    private static final String FIND_BY_EMAIL_SQL = "SELECT id, login, password, description, email, role, id_avatar, resend_password FROM USER WHERE EMAIL = ?";
 
-    private static final String FIND_BY_EMAIL_SQL = "SELECT id, login, password, description, email, role, avatar_src FROM USER WHERE LOGIN = ?";
+    private static final String FIND_BY_ID_SQL = "SELECT id, login, password, description, email, role, id_avatar, resend_password FROM USER WHERE ID = ?";
 
-    private static final String FIND_BY_ID_SQL = "SELECT id, login, password, description, email, role, avatar_src FROM USER WHERE LOGIN = ?";
-
-    /**
-     * Protected constructor without parameters
-     */
     protected UserDaoImpl() {
     }
 
     @Override
-    public void create(String login, String passwordHash, String description, String email, String avatarSrc) throws DaoException {
+    public void create(String login, String passwordHash, String description, String email, int idAvatarImage) throws DaoException {
         try (Connection connection = connectionPool.getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_SQL)) {
             statement.setString(1, login);
@@ -52,38 +45,30 @@ class UserDaoImpl implements UserDao {
             statement.setString(3, description);
             statement.setString(4, email);
             statement.setString(5, Role.USER.name());
-            statement.setString(6, avatarSrc);
+            statement.setInt(6, idAvatarImage);
+
+            Date sql = Date.valueOf(LocalDate.now());
+            statement.setString(7, sql.toString());
             statement.execute();
         } catch (SQLException e) {
             throw new DaoException("error when create user", e);
         }
     }
-    @Override
-    public void update(String login, String description, String email, String avatarSrc, Integer id) throws DaoException {
-        try (Connection connection = connectionPool.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_DATA_SQL)) {
-            statement.setString(1, login);
-            statement.setString(2, description);
-            statement.setString(3, email);
-            statement.setString(4, avatarSrc);
-            statement.setString(5, id.toString());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new DaoException("error when update with user id " + id, e);
-        }
-    }
 
     @Override
-    public void updatePassword(Integer id, String password) throws DaoException {
+    public void update(User user) throws DaoException {
         try (Connection connection = connectionPool.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_PASSWORD_SQL)) {
-            statement.setString(1, password);
-            statement.setString(2, id.toString());
+             PreparedStatement statement = connection.prepareStatement(UPDATE_DATA_SQL)) {
+            statement.setString(1, user.getLogin());
+            statement.setString(2, user.getDescription());
+            statement.setString(3, user.getEmail());
+            statement.setInt(4, user.getIdAvatar());
+            statement.setString(5, user.getResendPasswordDate().toString());
+            statement.setString(6, user.getPassword());
+            statement.setString(7, String.valueOf(user.getId()));
             statement.executeUpdate();
         } catch (SQLException e) {
-            String message = "error when update password " + password +
-                    "in user with id " + id;
-            throw new DaoException(message, e);
+            throw new DaoException("error when update with user id " + user.getId(), e);
         }
     }
 
@@ -95,6 +80,8 @@ class UserDaoImpl implements UserDao {
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 Role role = Role.valueOf(result.getString(USER_ROLE));
+                Date date = result.getDate(RESEND_PASSWORD);
+                LocalDate currentDate = date.toLocalDate();
                 var user = new User(
                         result.getInt(ID),
                         result.getString(LOGIN),
@@ -102,7 +89,8 @@ class UserDaoImpl implements UserDao {
                         result.getString(DESCRIPTION),
                         result.getString(EMAIL),
                         role,
-                        result.getString(AVATAR_SRC)
+                        result.getInt(ID_AVATAR),
+                        currentDate
                 );
                 users.add(user);
             }
@@ -156,6 +144,9 @@ class UserDaoImpl implements UserDao {
         User user = null;
         while (result.next()) {
             Role role = Role.valueOf(result.getString(USER_ROLE));
+            Date date = result.getDate(RESEND_PASSWORD);
+            LocalDate currentDate;
+            currentDate = date.toLocalDate();
             user = new User(
                     result.getInt(ID),
                     result.getString(LOGIN),
@@ -163,7 +154,8 @@ class UserDaoImpl implements UserDao {
                     result.getString(DESCRIPTION),
                     result.getString(EMAIL),
                     role,
-                    result.getString(AVATAR_SRC)
+                    result.getInt(ID_AVATAR),
+                    currentDate
             );
         }
         return user;

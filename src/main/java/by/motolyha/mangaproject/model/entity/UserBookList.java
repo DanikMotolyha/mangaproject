@@ -4,22 +4,22 @@ import java.util.Objects;
 
 public class UserBookList {
 
-    private Book book;
+    private Manga manga;
     private User user;
     private ReadingStatus readingStatus;
 
-    public UserBookList(Book book, User user, ReadingStatus readingStatus) {
-        this.book = book;
+    public UserBookList(Manga manga, User user, ReadingStatus readingStatus) {
+        this.manga = manga;
         this.user = user;
         this.readingStatus = readingStatus;
     }
 
-    public Book getBook() {
-        return book;
+    public Manga getBook() {
+        return manga;
     }
 
-    public void setBook(Book book) {
-        this.book = book;
+    public void setBook(Manga manga) {
+        this.manga = manga;
     }
 
     public User getUser() {
@@ -43,13 +43,13 @@ public class UserBookList {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserBookList that = (UserBookList) o;
-        return readingStatus == that.readingStatus && Objects.equals(book, that.book) && Objects.equals(user, that.user);
+        return readingStatus == that.readingStatus && Objects.equals(manga, that.manga) && Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
 
-        int result = 31 + (book != null ? book.hashCode() : 0);
+        int result = 31 + (manga != null ? manga.hashCode() : 0);
         result = 31 * result + (user != null ? user.hashCode() : 0);
         result = 31 * result + (readingStatus != null ? readingStatus.hashCode() : 0);
         return result;
@@ -58,7 +58,7 @@ public class UserBookList {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("UserBookList{");
-        sb.append("book=").append(book);
+        sb.append("book=").append(manga);
         sb.append(", user=").append(user);
         sb.append(", readingStatus=").append(readingStatus);
         sb.append('}');
